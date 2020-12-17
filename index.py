@@ -2,6 +2,29 @@ from os import listdir
 from os.path import isfile, join
 import os
 import shutil
+import time
+from watchdog.observers import Observer
+from watchdog.events import PatternMatchingEventHandler
+
+def on_created(event):
+    print(f"hey, {event.src_path} has been created!")
+    sort_files_in_a_folder(mypath)
+
+if __name__ == "__main__":
+    patterns = "*"
+    ignore_patterns = ""
+    ignore_directories = False
+    case_sensitive = True
+    my_event_handler = PatternMatchingEventHandler(patterns, ignore_patterns, ignore_directories, case_sensitive)
+
+    my_event_handler.on_created = on_created
+    path = "C:\\Users\\Youri\\Documents\\test"
+    go_recursively = True
+    my_observer = Observer()
+    my_observer.schedule(my_event_handler, path, recursive=go_recursively)
+
+mypath="C:\\Users\\Youri\\Documents\\test"
+
 def sort_files_in_a_folder(mypath):
     '''
     A function to sort the files in a download folder
@@ -26,8 +49,12 @@ def sort_files_in_a_folder(mypath):
         if filetype in filetype_folder_dict.keys():
             dest_path=filetype_folder_dict[str(filetype)]
             shutil.move(src_path,dest_path)
-    print(src_path + '>>>' + dest_path)
-if __name__=="__main__":
-    mypath="C:\\Users\\Youri\\Documents\\test"
-    sort_files_in_a_folder(mypath)
+
+my_observer.start()
+try:
+    while True:
+        time.sleep(1)
+except KeyboardInterrupt:
+    my_observer.stop()
+    my_observer.join()
     
