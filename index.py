@@ -5,10 +5,17 @@ import shutil
 import time
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
+from datetime import datetime
+import logging
 
 def on_created(event):
     print(f"hey, {event.src_path} has been created!")
     sort_files_in_a_folder(mypath)
+    logging.basicConfig(filename='logs.log',
+        filemode='a',
+        format='%(asctime)s %(message)s',
+        level=logging.DEBUG)
+    logging.info(f"hey, {event.src_path} has been created!")
 
 if __name__ == "__main__":
     patterns = "*"
@@ -34,7 +41,7 @@ def sort_files_in_a_folder(mypath):
     file_type_variation_list=[]
     filetype_folder_dict={}
     for file in files:
-        filetype=file.split('.')[1]
+        filetype=file.split('.')[-1]
         if filetype not in file_type_variation_list:
             file_type_variation_list.append(filetype)
             new_folder_name=mypath+'/'+ filetype + '_folder'
@@ -45,15 +52,18 @@ def sort_files_in_a_folder(mypath):
                 os.mkdir(new_folder_name)
     for file in files:
         src_path = mypath+'/'+file
-        filetype=file.split('.')[1]
-        if filetype in filetype_folder_dict.keys():
-            dest_path=filetype_folder_dict[str(filetype)]
-            shutil.move(src_path,dest_path)
+        filetype=file.split('.')[-1]
+        try: 
+            if  filetype in filetype_folder_dict.keys():
+                dest_path=filetype_folder_dict[str(filetype)]
+                shutil.move(src_path,dest_path)
+        except os.error:
+            return False
 
 my_observer.start()
 try:
     while True:
-        time.sleep(1)
+        time.sleep(10)
 except KeyboardInterrupt:
     my_observer.stop()
     my_observer.join()
