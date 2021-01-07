@@ -9,13 +9,13 @@ from datetime import datetime
 import logging
 
 def on_created(event):
-    print(f"hey, {event.src_path} has been created!")
+    print(f"{event.src_path} has been created!")
     sort_files_in_a_folder(mypath)
     logging.basicConfig(filename='logs.log',
         filemode='a',
         format='%(asctime)s %(message)s',
         level=logging.DEBUG)
-    logging.info(f"hey, {event.src_path} has been created!")
+    logging.info(f"{event.src_path} has been created!")
 
 if __name__ == "__main__":
     patterns = "*"
@@ -25,18 +25,17 @@ if __name__ == "__main__":
     my_event_handler = PatternMatchingEventHandler(patterns, ignore_patterns, ignore_directories, case_sensitive)
 
     my_event_handler.on_created = on_created
-    path = "C:\\Users\\Youri\\Documents\\test"
+    file = open('settings.ini',mode='r')
+    path = file.read()
     go_recursively = True
     my_observer = Observer()
     my_observer.schedule(my_event_handler, path, recursive=go_recursively)
 
-mypath="C:\\Users\\Youri\\Documents\\test"
+file = open('settings.ini',mode='r')
+mypath = file.read()
+
 
 def sort_files_in_a_folder(mypath):
-    '''
-    A function to sort the files in a download folder
-    into their respective categories
-    '''
     files = [f for f in listdir(mypath) if isfile(join(mypath, f))]
     file_type_variation_list=[]
     filetype_folder_dict={}
